@@ -2,6 +2,7 @@ package com.project.a20231004_aartisridhar_nycschools.presenter
 
 import android.util.Log
 import com.project.a20231004_aartisridhar_nycschools.listener.SchoolViewListener
+import com.project.a20231004_aartisridhar_nycschools.model.SatScoreDataModel
 import com.project.a20231004_aartisridhar_nycschools.model.SchoolDataModel
 import com.project.a20231004_aartisridhar_nycschools.model.SchoolService
 import io.reactivex.disposables.Disposable
@@ -17,7 +18,7 @@ class SchoolListPresenter @Inject constructor(
             .map { response ->
             //transforming objects from response to SchoolDataModel type
                 response.map { schoolData ->
-                    SchoolDataModel(schoolData.school_name,schoolData.website)
+                    SchoolDataModel(schoolData.dbn,schoolData.school_name,schoolData.website)
                 }
             }
             .subscribe(
@@ -33,6 +34,37 @@ class SchoolListPresenter @Inject constructor(
                     // Error handling here
                     Log.e("###Presentor Error", "${error.message}")
                 }
+            )
+    }
+
+    override fun fetchSchoolDetailsByDBN(dbn:String) {
+        disposable = schoolService.getSatScoreDataForSchool()
+            .map { response ->
+                    response.firstOrNull{ selectedSchool -> selectedSchool.dbn == dbn }
+                 }
+            .map { selectedSchool ->
+                    SatScoreDataModel(
+                        selectedSchool.school_name,
+                        selectedSchool.num_of_sat_test_takers,
+                        selectedSchool.sat_writing_avg_score,
+                        selectedSchool.sat_math_avg_score,
+                        selectedSchool.sat_critical_reading_avg_score
+                    )
+                }
+            .subscribe(
+                { schoolDetails ->
+                    Log.d("API Response", schoolDetails.toString())
+                    if (schoolDetails!=null) {
+                       schoolView.showSchoolDetailsScreen(schoolDetails)
+                    } else {
+                        schoolView.showError("School Info not available")
+                    }
+                },
+                { error ->
+                    // Error handling here
+                    Log.e("###Presentor Error", "${error.message}")
+                }
+
             )
     }
 

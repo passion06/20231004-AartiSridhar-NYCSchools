@@ -10,6 +10,4 @@ data class SchoolDataModel(
     val school_name: String,
     val website:String
     // Add other properties as needed
-): Parcelable{
-    constructor(school_name: String, website: String) : this("", school_name, website)
-}
+) : Parcelable

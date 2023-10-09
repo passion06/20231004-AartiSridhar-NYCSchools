@@ -1,16 +1,17 @@
 package com.project.a20231004_aartisridhar_nycschools.view
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Orientation
 import com.project.a20231004_aartisridhar_nycschools.R
 import com.project.a20231004_aartisridhar_nycschools.dagger.DaggerApp
 import com.project.a20231004_aartisridhar_nycschools.databinding.SchoolListBinding
 import com.project.a20231004_aartisridhar_nycschools.listener.SchoolViewListener
+import com.project.a20231004_aartisridhar_nycschools.model.SatScoreDataModel
 import com.project.a20231004_aartisridhar_nycschools.model.SchoolAPI
 import com.project.a20231004_aartisridhar_nycschools.model.SchoolDataModel
 import com.project.a20231004_aartisridhar_nycschools.model.SchoolService
@@ -33,44 +34,39 @@ class SchoolListActivity: AppCompatActivity(), SchoolViewListener.View {
         val schoolService = SchoolService(SchoolAPI.create())
         schoolListPresenter = SchoolListPresenter(this,schoolService)
         schoolListPresenter.fetchSchoolList()
-       // configureSATScoresView()
     }
 
-    fun configureSATScoresView(){
-        Log.d("###Started","Inside SAT Scores Configure View")
-        val schoolAPI = SchoolAPI.create()
-        val schoolService = SchoolService(schoolAPI)
-        val satDisposable = schoolService.getSatScoreDataForSchool()
-            .subscribe(
-                { response ->
-                    val satResponse = response.toString()
-                    // School data is available
-                    Log.d("API Response",response.toString())
-                },
-                { error ->
-                    // Handle the error here
-                    Log.e("###Error","${error.message}")
-                }
-            )
+    private val schoolItemClickListener = object: SchoolListActivityAdapter.ItemClickListener {
+        override fun onSchoolClick(dbn: String) {
+            schoolListPresenter.fetchSchoolDetailsByDBN(dbn)
+        }
     }
     override fun showSchoolList(schoolList: List<SchoolDataModel>) {
         Log.d("size","${schoolList.size}")
         Log.d("##Activity method","Show School List")
-        val recyclerView = findViewById<RecyclerView>(R.id.recycler_view_schools)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        val schoolAdapter = SchoolListActivityAdapter(schoolList)
-        recyclerView.adapter = schoolAdapter
-        recyclerView.addItemDecoration(
-            DividerItemDecoration(
-                baseContext,
-                DividerItemDecoration.VERTICAL
+        val schoolListRecyclerView = findViewById<RecyclerView>(R.id.recycler_view_schools)
+        val schoolLayoutManager = LinearLayoutManager(this)
+        schoolListRecyclerView.apply {
+            layoutManager = schoolLayoutManager
+            val schoolAdapter = SchoolListActivityAdapter(schoolList, schoolItemClickListener)
+            adapter = schoolAdapter
+            addItemDecoration(
+                DividerItemDecoration(
+                    baseContext,
+                    DividerItemDecoration.VERTICAL
+                )
             )
-        )
-        schoolAdapter.notifyDataSetChanged()
+        }
     }
 
     override fun showError(message: String) {
         TODO("Not yet implemented")
+    }
+
+    override fun showSchoolDetailsScreen(schoolDetails: SatScoreDataModel) {
+        val intent = Intent(this,SchoolDetailActivity::class.java)
+        intent.putExtra("schoolDetails",schoolDetails)
+        startActivity(intent)
     }
 
     override fun onDestroy(){

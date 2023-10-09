@@ -8,10 +8,8 @@ import kotlinx.parcelize.Parcelize
 data class SchoolDataModel(
     val dbn: String,
     val school_name: String,
-    val boro: String,
-    val overview_paragraph: String,
-    val academicOpportunities1: String,
-    val academicOpportunities2: String,
     val website:String
     // Add other properties as needed
-): Parcelable
+): Parcelable{
+    constructor(school_name: String, website: String) : this("", school_name, website)
+}

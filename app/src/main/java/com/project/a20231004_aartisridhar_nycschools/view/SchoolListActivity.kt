@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.project.a20231004_aartisridhar_nycschools.R
 import com.project.a20231004_aartisridhar_nycschools.dagger.DaggerApp
 import com.project.a20231004_aartisridhar_nycschools.databinding.SchoolListBinding
 import com.project.a20231004_aartisridhar_nycschools.listener.SchoolViewListener
@@ -23,14 +22,14 @@ class SchoolListActivity: AppCompatActivity(), SchoolViewListener.View {
 
     @Inject
     lateinit var schoolListPresenter:SchoolListPresenter
-    //private lateinit var schoolListBinding:SchoolListBinding
+    private lateinit var schoolListBinding:SchoolListBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
 //        val schoolComponent = (applicationContext as DaggerApp).daggerComponent
 //        schoolComponent.inject(this)
         super.onCreate(savedInstanceState)
-       // schoolListBinding = SchoolListBinding.inflate(layoutInflater)
-        setContentView(R.layout.school_list)
+        schoolListBinding = SchoolListBinding.inflate(layoutInflater)
+        setContentView(schoolListBinding.root)
         val schoolService = SchoolService(SchoolAPI.create())
         schoolListPresenter = SchoolListPresenter(this,schoolService)
         schoolListPresenter.fetchSchoolList()
@@ -44,7 +43,7 @@ class SchoolListActivity: AppCompatActivity(), SchoolViewListener.View {
     override fun showSchoolList(schoolList: List<SchoolDataModel>) {
         Log.d("size","${schoolList.size}")
         Log.d("##Activity method","Show School List")
-        val schoolListRecyclerView = findViewById<RecyclerView>(R.id.recycler_view_schools)
+        val schoolListRecyclerView = schoolListBinding.recyclerViewSchools
         val schoolLayoutManager = LinearLayoutManager(this)
         schoolListRecyclerView.apply {
             layoutManager = schoolLayoutManager

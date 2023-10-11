@@ -1,14 +1,18 @@
 package com.project.a20231004_aartisridhar_nycschools.view.adapter
 
+import android.content.Context
+import android.provider.Settings.Global.getString
+import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
 import com.project.a20231004_aartisridhar_nycschools.R
+import androidx.recyclerview.widget.RecyclerView
+import com.project.a20231004_aartisridhar_nycschools.R.*
 import com.project.a20231004_aartisridhar_nycschools.databinding.SchoolItemBinding
 import com.project.a20231004_aartisridhar_nycschools.model.SchoolDataModel
 
-class SchoolListActivityAdapter(private var schoolList:List<SchoolDataModel>,private val itemClickListener:ItemClickListener): RecyclerView.Adapter<SchoolListActivityAdapter.SchoolViewHolder>() {
+class SchoolListActivityAdapter(private var schoolList:List<SchoolDataModel>,private val itemClickListener:ItemClickListener,private val context: Context): RecyclerView.Adapter<SchoolListActivityAdapter.SchoolViewHolder>() {
     private lateinit var schoolItemBinding:SchoolItemBinding
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SchoolViewHolder {
@@ -23,14 +27,16 @@ class SchoolListActivityAdapter(private var schoolList:List<SchoolDataModel>,pri
     }
 
     override fun onBindViewHolder(holder: SchoolViewHolder, position: Int) {
-        Log.d("Iniside adapter","Bind view method of adapter")
         val schoolItem = schoolList[position]
         holder.schoolName.text = schoolItem.school_name
         holder.website.text = schoolItem.website
+        holder.website.movementMethod = LinkMovementMethod.getInstance()
         //Setting the item click listener when a row is selected
         holder.itemView.setOnClickListener{
             if(schoolItem.dbn.isNotEmpty()){
-                itemClickListener.onSchoolClick(schoolItem.dbn)
+                itemClickListener.onSchoolClick(schoolItem.dbn,schoolItem.overview_paragraph)
+            } else {
+                itemClickListener.onError(context.getString(string.error_text))
             }
         }
     }
@@ -40,7 +46,8 @@ class SchoolListActivityAdapter(private var schoolList:List<SchoolDataModel>,pri
         val website = itemBinding.website
     }
     interface ItemClickListener{
-        fun onSchoolClick(dbn:String)
+        fun onSchoolClick(dbn:String,overview:String?)
+        fun onError(message:String)
     }
 }
 

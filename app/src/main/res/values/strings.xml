@@ -1,3 +1,13 @@
 <resources>
-    <string name="app_name">20231004-AartiSridhar-NYCSchools</string>
+    <string name="app_name">NYC Schools</string>
+    <string name="detail_screen_name">School Details</string>
+    <string name="sat_stats">SAT STATS</string>
+    <string name="sat_takers_label">Takers:</string>
+    <string name="math_average">Math Average:</string>
+    <string name="critical_reading_average">"Critical Reading Average: "</string>
+    <string name="writing_average">"Writing Average: "</string>
+    <string name="error">"Error "</string>
+    <string name="error_text">"Something went wrong. Please try again later"</string>
+    <string name="no_school_details">No Additional Data for this School is available during this time.
+ Check the school website for more details</string>
 </resources>

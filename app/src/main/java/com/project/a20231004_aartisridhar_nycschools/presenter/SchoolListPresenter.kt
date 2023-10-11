@@ -1,6 +1,9 @@
 package com.project.a20231004_aartisridhar_nycschools.presenter
 
+import android.content.Context
 import android.util.Log
+import androidx.core.content.ContextCompat.getString
+import com.project.a20231004_aartisridhar_nycschools.R
 import com.project.a20231004_aartisridhar_nycschools.listener.SchoolViewListener
 import com.project.a20231004_aartisridhar_nycschools.model.SatScoreDataModel
 import com.project.a20231004_aartisridhar_nycschools.model.SchoolDataModel
@@ -10,7 +13,7 @@ import javax.inject.Inject
 
 class SchoolListPresenter @Inject constructor(
     private val schoolView: SchoolViewListener.View,
-    private val schoolService: SchoolService
+    private val schoolService: SchoolViewListener.Service
 ) : SchoolViewListener.Presenter {
     private lateinit var disposable: Disposable
     override fun fetchSchoolList() {
@@ -18,54 +21,68 @@ class SchoolListPresenter @Inject constructor(
             .map { response ->
             //transforming objects from response to SchoolDataModel type
                 response.map { schoolData ->
-                    SchoolDataModel(schoolData.dbn,schoolData.school_name,schoolData.website)
+                    SchoolDataModel(
+                        schoolData.dbn,
+                        schoolData.school_name,
+                        schoolData.website,
+                        schoolData.overview_paragraph
+                    )
                 }
             }
             .subscribe(
-                { schoolInfo ->
-                    Log.d("API Response", schoolInfo.toString())
-                    if (schoolInfo.isNotEmpty()) {
-                        schoolView.showSchoolList(schoolInfo)
-                    } else {
-                        schoolView.showError("School Info not available now")
-                    }
-                },
+                { schoolInfo -> handleSchoolInfo(schoolInfo)},
                 { error ->
                     // Error handling here
-                    Log.e("###Presentor Error", "${error.message}")
+                    Log.e("Error", "${error.message}")
                 }
             )
     }
 
-    override fun fetchSchoolDetailsByDBN(dbn:String) {
+    private fun handleSchoolInfo(schoolInfo: List<SchoolDataModel>) {
+        if (schoolInfo.isNotEmpty()) {
+            schoolView.showSchoolList(schoolInfo)
+        } else {
+            schoolView.showError("School Info not available now")
+        }
+    }
+
+    override fun fetchSchoolDetailsByDBN(context: Context, dbn:String, overview:String) {
         disposable = schoolService.getSatScoreDataForSchool()
             .map { response ->
-                    response.firstOrNull{ selectedSchool -> selectedSchool.dbn == dbn }
+                    response.filter{ selectedSchool -> selectedSchool.dbn == dbn }
                  }
-            .map { selectedSchool ->
-                    SatScoreDataModel(
-                        selectedSchool.school_name,
-                        selectedSchool.num_of_sat_test_takers,
-                        selectedSchool.sat_writing_avg_score,
-                        selectedSchool.sat_math_avg_score,
-                        selectedSchool.sat_critical_reading_avg_score
-                    )
+            .map { filteredSchool ->
+                    val selectedSchool = filteredSchool.firstOrNull()
+                    if(selectedSchool==null){
+                        schoolView.showError(getString(context,R.string.no_school_details))
+                        null
+                    } else {
+                                SatScoreDataModel(
+                                    selectedSchool.school_name,
+                                    selectedSchool.num_of_sat_test_takers,
+                                    selectedSchool.sat_writing_avg_score,
+                                    selectedSchool.sat_math_avg_score,
+                                    selectedSchool.sat_critical_reading_avg_score,
+                                    overview
+                                )
+                        }
                 }
             .subscribe(
-                { schoolDetails ->
-                    Log.d("API Response", schoolDetails.toString())
-                    if (schoolDetails!=null) {
-                       schoolView.showSchoolDetailsScreen(schoolDetails)
-                    } else {
-                        schoolView.showError("School Info not available")
-                    }
-                },
+                { schoolDetails -> handleSchoolDetails(context,schoolDetails)},
                 { error ->
                     // Error handling here
-                    Log.e("###Presentor Error", "${error.message}")
+                    Log.e("Error", "${error.message}")
                 }
 
             )
+    }
+
+    private fun handleSchoolDetails(context:Context,schoolDetails:SatScoreDataModel?){
+        if (schoolDetails!=null) {
+            schoolView.showSchoolDetailsScreen(schoolDetails)
+        } else {
+            schoolView.showError(getString(context,R.string.no_school_details))
+        }
     }
 
     fun clearDisposable() {

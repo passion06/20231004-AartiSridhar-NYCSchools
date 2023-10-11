@@ -1,11 +1,12 @@
 package com.project.a20231004_aartisridhar_nycschools.model
 
 import android.util.Log
+import com.project.a20231004_aartisridhar_nycschools.listener.SchoolViewListener
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
-class SchoolService(private val schoolAPI: SchoolAPI) :SchoolAPI {
+class SchoolService(private val schoolAPI: SchoolAPI) :SchoolAPI,SchoolViewListener.Service {
     override fun getSchoolList(): Observable<List<SchoolDataModel>> {
         Log.d("schoolList","Inside method")
         return schoolAPI.getSchoolList()

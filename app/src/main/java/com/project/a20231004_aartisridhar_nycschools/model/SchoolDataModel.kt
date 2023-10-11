@@ -8,6 +8,7 @@ import kotlinx.parcelize.Parcelize
 data class SchoolDataModel(
     val dbn: String,
     val school_name: String,
-    val website:String
+    val website:String,
+    val overview_paragraph:String
     // Add other properties as needed
 ) : Parcelable

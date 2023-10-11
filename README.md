@@ -10,9 +10,9 @@ This is a sample android app developed for students/users in the NYC area to be 
 
 ## Screenshots
 
-![School List](school_list.png)
-![School Details](school_details.png)
-![Alert PopUp](alert_popup.png)
+![School List](school_list.png|width = 150|height = 100 )
+![School Details](school_details.png|width = 150|height = 100)
+![Alert PopUp](alert_popup.png|width = 150|height = 100)
 
 ## TechStack
 

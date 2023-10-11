@@ -2,7 +2,6 @@ package com.project.a20231004_aartisridhar_nycschools.dagger
 
 import com.project.a20231004_aartisridhar_nycschools.presenter.SchoolDetailPresenter
 import com.project.a20231004_aartisridhar_nycschools.presenter.SchoolListPresenter
-import com.project.a20231004_aartisridhar_nycschools.view.SchoolDetailActivity
 import com.project.a20231004_aartisridhar_nycschools.view.SchoolListActivity
 import dagger.Component
 import javax.inject.Singleton

@@ -6,16 +6,18 @@ import com.project.a20231004_aartisridhar_nycschools.model.SchoolDataModel
 import io.reactivex.Observable
 
 interface SchoolViewListener {
-    interface View{
-        fun showSchoolList(schoolList:List<SchoolDataModel>)
+    interface View {
+        fun showSchoolList(schoolList: List<SchoolDataModel>)
         fun showError(message: String)
-        fun showSchoolDetailsScreen(schoolDetails:SatScoreDataModel)
+        fun showSchoolDetailsScreen(schoolDetails: SatScoreDataModel)
     }
-    interface Presenter{
+
+    interface Presenter {
         fun fetchSchoolList()
-        fun fetchSchoolDetailsByDBN(context: Context, dbn:String, overview:String)
+        fun fetchSchoolDetailsByDBN(context: Context, dbn: String, overview: String)
     }
-    interface Service{
+
+    interface Service {
         fun getSchoolList(): Observable<List<SchoolDataModel>>
         fun getSatScoreDataForSchool(): Observable<List<SatScoreDataModel>>
     }

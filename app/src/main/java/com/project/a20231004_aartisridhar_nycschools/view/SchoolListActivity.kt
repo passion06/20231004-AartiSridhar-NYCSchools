@@ -30,7 +30,7 @@ class SchoolListActivity : AppCompatActivity(), SchoolViewListener.View {
         super.onCreate(savedInstanceState)
         schoolListBinding = SchoolListBinding.inflate(layoutInflater)
         setContentView(schoolListBinding.root)
-        //Ideally the below dagger code should go in the DaggerApp class in the dagger package
+        //TODO Ideally the below dagger code should go in the DaggerApp class in the dagger package
         DaggerSchoolComponent.builder()
             .schoolModule(SchoolModule(this))
             .build()
@@ -38,6 +38,7 @@ class SchoolListActivity : AppCompatActivity(), SchoolViewListener.View {
         configureView()
     }
 
+    //TODO Hardcoding some strings for now, but ideally should come from string resource file
     private fun configureView() {
         val toolbar = schoolListBinding.topAppBar
         setSupportActionBar(toolbar)
@@ -45,8 +46,10 @@ class SchoolListActivity : AppCompatActivity(), SchoolViewListener.View {
         schoolListPresenter.fetchSchoolList()
     }
 
+    //Callback implemented when a school row is selected from the adapter
     private val schoolItemClickListener = object : SchoolListActivityAdapter.ItemClickListener {
         override fun onSchoolClick(dbn: String, overview: String?) {
+            //Handle case where no overview is available or is null for a selected school
             if (overview.isNullOrBlank()) {
                 schoolListPresenter.fetchSchoolDetailsByDBN(
                     this@SchoolListActivity,
@@ -57,12 +60,13 @@ class SchoolListActivity : AppCompatActivity(), SchoolViewListener.View {
                 schoolListPresenter.fetchSchoolDetailsByDBN(this@SchoolListActivity, dbn, overview)
             }
         }
-
+        //Handle error case- if dbn field is null
         override fun onError(message: String) {
             alertDialog.onError(message)
         }
     }
 
+    //Handles rendering schoolList in the adapter
     override fun showSchoolList(schoolList: List<SchoolDataModel>) {
         val schoolListRecyclerView = schoolListBinding.recyclerViewSchools
         val schoolLayoutManager = LinearLayoutManager(this)
@@ -84,12 +88,14 @@ class SchoolListActivity : AppCompatActivity(), SchoolViewListener.View {
         alertDialog.onError(message)
     }
 
+    //Passes intent with the school details to SchoolDetailsActivity
     override fun showSchoolDetailsScreen(schoolDetails: SatScoreDataModel) {
         val intent = Intent(this, SchoolDetailActivity::class.java)
         intent.putExtra("schoolDetails", schoolDetails)
         startActivity(intent)
     }
 
+    //handles clearing disposables onDestroy of activity
     override fun onDestroy() {
         super.onDestroy()
         schoolListPresenter.clearDisposable()
